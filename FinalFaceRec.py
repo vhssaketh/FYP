@@ -31,28 +31,33 @@ class FaceRecognition:
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         faces = self.detector.detect_faces(imgRGB)
         print(len(faces))
-        if len(faces)==0:
-            print("NO FACE!!!!!")
+        if len(faces)>1:
+            return None
         for face in faces:
             x1, y1, w1, h1 = face['box']
             cv2.rectangle(imgRGB, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 3)
             imgRGB = imgRGB[y1:y1 + h1, x1:x1 + w1,:]
-
-        imgfinal = cv2.cvtColor(imgRGB, cv2.COLOR_RGB2GRAY)
-        imgfinal=cv2.resize(imgfinal,(360,340))
+        try:
+            imgfinal = cv2.cvtColor(imgRGB, cv2.COLOR_RGB2GRAY)
+        except:
+            print(imgfinal.shape)
+            print(imgfinal)
+        imgfinal=cv2.resize(imgfinal,(360,480))
         return imgfinal
 
     def captureData(self,path):
+        counter=0
         i = 0
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        while True:
+        cap = cv2.VideoCapture("D:\\TestProject\\Jitesh.mp4")
+        while cap.isOpened():
             ret, img = cap.read()
-            imgFinal = self.find_face(img)
-            if not imgFinal is None:
-                filename=str(i)+'.jpeg'
-                cv2.imwrite(os.path.join(path,filename),imgFinal)
-                i += 1
-                print('No. of images : '+ str(i))
+            if counter%4==0:
+                imgFinal = self.find_face(img)
+                if not imgFinal is None:
+                    filename=str(i)+'.jpeg'
+                    cv2.imwrite(os.path.join(path,filename),imgFinal)
+                    i += 1
+                    print('No. of images : '+ str(i))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
@@ -65,7 +70,7 @@ class FaceRecognition:
             for trainImg in os.listdir(imagePath):
                 image = cv2.imread(os.path.join(imagePath, trainImg))
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                print(gray[50:-70,130:-170].shape)
+                #print(gray[50:-70,130:-170].shape)
                 hist = self.desc.calc_hist(gray[50:-70,130:-170])
                 labels.append(int(imageFolder[-1]))
                 data.append(hist)
@@ -104,7 +109,13 @@ class FaceRecognition:
             print('Accuracy on test set is : '+str(acc)+'%')
         return model
 
-
 testClass=FaceRecognition(8)
-testClass.captureData("D:\\TestProject\\DataSetReal")
+testClass.captureData("D:\\TestProject\\DataSetRealJitesh") ##Replace path here 
+
+
+
+
+
+
+
 
