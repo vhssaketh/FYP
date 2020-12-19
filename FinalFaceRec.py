@@ -20,38 +20,35 @@ class FaceRecognition:
         prediction = model.predict(hist.reshape(1, -1))
         return prediction
 
-    def predictImg(self,img,model):  # Input : BGR Image; Output : Face Prediction
-        image=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        hist = self.desc.calc_hist(image[40:-70, 120:-180])
+    def predictImg(self,img,model):  # Input : Gray Image; Output : Face Prediction
+        #image=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        hist = self.desc.calc_hist(img)
         hist = np.array(hist)
         prediction = model.predict(hist.reshape(1, -1))
         return prediction
 
-    def find_face(self,img):   # Input : BGR Image; Output : BGR Image with bounded faces
+    def find_face(self,img):          # Input : BGR Image; Output : GRAY Image with bounded faces and resized to 360x480
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         faces = self.detector.detect_faces(imgRGB)
-        print(len(faces))
-        if len(faces)>1:
-            return None
+        if len(faces)==0:
+            return np.asarray([0,0,0])
         for face in faces:
             x1, y1, w1, h1 = face['box']
-            cv2.rectangle(imgRGB, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 3)
-            imgRGB = imgRGB[y1:y1 + h1, x1:x1 + w1,:]
-        try:
+            # cv2.rectangle(imgRGB, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 3)
+            imgRGB = imgRGB[y1:y1 + h1, x1:x1 + w1, :]
             imgfinal = cv2.cvtColor(imgRGB, cv2.COLOR_RGB2GRAY)
-        except:
-            print(imgfinal.shape)
-            print(imgfinal)
+            break
         imgfinal=cv2.resize(imgfinal,(360,480))
         return imgfinal
 
     def captureData(self,path):
         counter=0
         i = 0
-        cap = cv2.VideoCapture("D:\\TestProject\\Jitesh.mp4")
-        while cap.isOpened():
+        cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        while True:
+
             ret, img = cap.read()
-            if counter%4==0:
+            if counter%7==0:
                 imgFinal = self.find_face(img)
                 if not imgFinal is None:
                     filename=str(i)+'.jpeg'
@@ -60,6 +57,7 @@ class FaceRecognition:
                     print('No. of images : '+ str(i))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+            counter+=1
 
     def trainRecognizer(self, trainPath, printAcc, testPath = None):
         data = []
@@ -71,7 +69,7 @@ class FaceRecognition:
                 image = cv2.imread(os.path.join(imagePath, trainImg))
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 #print(gray[50:-70,130:-170].shape)
-                hist = self.desc.calc_hist(gray[50:-70,130:-170])
+                hist = self.desc.calc_hist(gray)
                 labels.append(int(imageFolder[-1]))
                 data.append(hist)
             print("Processed folder " + imageFolder)
@@ -94,7 +92,7 @@ class FaceRecognition:
                 for testImg in os.listdir(imagePath):
                     image = cv2.imread(os.path.join(imagePath, testImg))
                     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                    hist = self.desc.calc_hist(gray[50:-70,130:-170])
+                    hist = self.desc.calc_hist(gray)
                     hist = np.array(hist)
                     prediction = model.predict(hist.reshape(1, -1))
                     total += 1
@@ -108,9 +106,6 @@ class FaceRecognition:
             acc = (correct/total)*100
             print('Accuracy on test set is : '+str(acc)+'%')
         return model
-
-testClass=FaceRecognition(8)
-testClass.captureData("D:\\TestProject\\DataSetRealJitesh") ##Replace path here 
 
 
 
