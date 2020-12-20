@@ -68,6 +68,8 @@ def click2():
             predictions = []
             for faceIndex in faceCount:
                 imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                key = "Face" + str (faceIndex)
+                x1,y1,w1,h1 = faceMemo[key]
                 imageFace = imgGray[y1:y1 + h1, x1:x1 + w1]
                 imageFace=cv2.resize(imageFace,(360,480))
                 predictions.append(faceRec.predictImg(imageFace, model)) 
