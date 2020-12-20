@@ -39,7 +39,8 @@ class FaceRecognition:
             key = "Face" + str (i)
             x1, y1, w1, h1 = face['box']
             # cv2.rectangle(imgRGB, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 3)
-            memo.add (key, [x1, y1, w1, h1])
+            memo[key] = [x1, y1, w1, h1]
+            #memo.add (key, [x1, y1, w1, h1])
             #imgRGB = imgRGB[y1:y1 + h1, x1:x1 + w1, :]
             #imgfinal = cv2.cvtColor(imgRGB, cv2.COLOR_RGB2GRAY)
             i += 1    
