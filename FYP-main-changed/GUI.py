@@ -55,7 +55,7 @@ def click2():
             #dict length = num faces
             
             faceMemo = faceRec.find_face(img)
-            faceCount = length (faceMemo.keys ()) 
+            faceCount = len (faceMemo.keys ()) 
             #if imgFaces.all()==0:
             if faceCount==0:
                 print('No Face Found!')
@@ -64,9 +64,10 @@ def click2():
                 cv2.imshow('frame', image)
                 cv2.waitKey(1)
                 continue
+            
             #iterate over length dict
             predictions = []
-            for faceIndex in faceCount:
+            for faceIndex in range(faceCount):
                 imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 key = "Face" + str (faceIndex)
                 x1,y1,w1,h1 = faceMemo[key]
@@ -74,7 +75,8 @@ def click2():
                 imageFace=cv2.resize(imageFace,(360,480))
                 predictions.append(faceRec.predictImg(imageFace, model)) 
 
-                image = cv2.putText(img, str(prediction), org, font,
+                orgTemp = (x1, y1)
+                image = cv2.putText(img, str(predictions[-1]), orgTemp, font,
                                 fontScale, color, thickness, cv2.LINE_AA)
             
             cv2.imshow('frame', image)
