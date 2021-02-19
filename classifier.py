@@ -19,12 +19,17 @@ for imageFolder in os.listdir(trainPath):
             images = cv2.rectangle(gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
             imageFac = cv2.resize(images, (360, 480))
         hist = desc.calc_hist(imageFac)
-        #labels.append(int(imageFolder[-2:]))
+        labels.append(int(imageFolder[-2:]))
         data.append(hist)
+        
     print("Processed folder " + imageFolder)
     if imageFolder == "Subject03":
         break
 
+   # For a label L, avg of the histograms
+#avgHist={#Classes}
+        
+        
 for imageFolder in os.listdir(testPath):
     imagePath = os.path.join(testPath, imageFolder)
     for testImg in os.listdir(imagePath):
@@ -38,7 +43,9 @@ for imageFolder in os.listdir(testPath):
         for i in range(len(data)):
             hist2 = data[i]
             hist2 = np.array(hist2, dtype=np.float32)
+            #for i in range ():
             v = cv2.compareHist(hist, hist2, cv2.HISTCMP_CORREL)
+            
             print(v)
     print("Processed folder " + imageFolder)
     if imageFolder == "Subject03":
